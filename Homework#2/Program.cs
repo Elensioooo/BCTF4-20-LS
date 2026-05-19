@@ -51,6 +51,10 @@
                         Console.WriteLine($"{firstNumber} * {secondNumber} = {firstNumber * secondNumber}");
                         break;
                     case "/":
+                        if(secondNumber == 0)
+                        {
+                            Console.WriteLine("number cannot be divided by 0");
+                        }
                         Console.WriteLine($"{firstNumber} / {secondNumber} = {firstNumber / secondNumber}");
                         break;
                     default:
