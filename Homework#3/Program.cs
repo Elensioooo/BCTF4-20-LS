@@ -5,7 +5,7 @@
         static void Main(string[] args)
         {
             #region Homework#1
-            int number;//5
+            int number;
             Console.Write("Enter the number: ");
             bool validNumber = int.TryParse(Console.ReadLine(), out number);
             
