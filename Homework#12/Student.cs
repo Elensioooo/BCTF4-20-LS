@@ -4,7 +4,7 @@ using System.Drawing;
 
 namespace Homework_12
 {
-    internal class Student : IComparable<Student>
+    internal class Student : Person, IComparable<Student>, IPrintable
     {
         private string _name;
         private string _lastName;
@@ -58,8 +58,8 @@ namespace Homework_12
             }
             set
             {
-                if (value <= 0)
-                    throw new ArgumentException("Age cannot be negative or 0");
+                if (value <= 16)
+                    throw new ArgumentException("Age must be greater than 16");
                 _age = value;
             }
         }
@@ -127,37 +127,34 @@ namespace Homework_12
             return $"Name: {Name}, LastName: {LastName}, Age: {Age}, Email: {Email}, Phone: {Phone}, GPA: {GPA}, Faculty: {Faculty}";
         }
 
-        
+
         public static Student[] GetBestStudents(Student[] studentsArray)
         {
-            if (studentsArray == null)
-                throw new ArgumentNullException(nameof(studentsArray));
-            if (studentsArray.Length == 0)
-                throw new ArgumentException("Given array is empty");
+            ValidateArray(studentsArray);
 
             int count = 0;
             double highestGPA = studentsArray[0].GPA;
-            foreach(Student student in studentsArray)
+            foreach (Student student in studentsArray)
             {
-                if(student.GPA > highestGPA)
+                if (student.GPA > highestGPA)
                 {
                     highestGPA = student.GPA;
                 }
             }
 
-            foreach(Student student in studentsArray)
+            foreach (Student student in studentsArray)
             {
-                if(highestGPA == student.GPA)
+                if (highestGPA == student.GPA)
                 {
                     count++;
                 }
             }
 
             Student[] bestStudents = new Student[count];
-            int index =0;
-            foreach(Student student in studentsArray)
+            int index = 0;
+            foreach (Student student in studentsArray)
             {
-                if(highestGPA == student.GPA)
+                if (highestGPA == student.GPA)
                 {
                     bestStudents[index] = student;
                     index++;
@@ -170,13 +167,10 @@ namespace Homework_12
         //with collections
         public static List<Student> GetHighestGpaStudents(Student[] studentsArray)
         {
-            if (studentsArray == null)
-                throw new ArgumentNullException(nameof(studentsArray));
-            if (studentsArray.Length == 0)
-                throw new ArgumentException("Given array is empty");
+            ValidateArray(studentsArray);
 
             double highestGPA = studentsArray[0].GPA;
-            foreach(Student student in studentsArray)
+            foreach (Student student in studentsArray)
             {
                 if (student.GPA > highestGPA)
                     highestGPA = student.GPA;
@@ -194,14 +188,11 @@ namespace Homework_12
 
         public static double GetGpaAverage(Student[] studentsArray)
         {
-            if (studentsArray == null)
-                throw new ArgumentNullException(nameof(studentsArray));
-            if (studentsArray.Length == 0)
-                throw new ArgumentException("Given array is empty");
+            ValidateArray(studentsArray);
 
             double sum = 0;
             double gpaAevrage;
-            foreach(Student student in studentsArray)
+            foreach (Student student in studentsArray)
             {
                 sum += student.GPA;
             }
@@ -215,13 +206,10 @@ namespace Homework_12
         {
             if (string.IsNullOrWhiteSpace(lastName))
                 throw new ArgumentException("Given Lastname is emtpy");
-            if(studentsArray == null)
-                throw new ArgumentNullException(nameof(studentsArray));
-            if (studentsArray.Length == 0)
-                throw new ArgumentException("Given Array is empty");
+            ValidateArray(studentsArray);
 
             List<Student> resultStudents = new List<Student>();
-            foreach(Student student in studentsArray)
+            foreach (Student student in studentsArray)
             {
                 if (student.LastName.ToLower().Contains(lastName.Trim().ToLower()))
                     resultStudents.Add(student);
@@ -234,13 +222,10 @@ namespace Homework_12
         {
             if (string.IsNullOrWhiteSpace(lastName))
                 throw new ArgumentException("Given Lastname is emtpy");
-            if (studentsArray == null)
-                throw new ArgumentNullException(nameof(studentsArray));
-            if (studentsArray.Length == 0)
-                throw new ArgumentException("Given Array is empty");
+            ValidateArray(studentsArray);
 
             int count = 0;
-            foreach(Student student in studentsArray)
+            foreach (Student student in studentsArray)
             {
                 if (student.LastName.ToLower().Contains(lastName.Trim().ToLower()))
                     count++;
@@ -248,28 +233,25 @@ namespace Homework_12
 
             Student[] foundStudents = new Student[count];
             int index = 0;
-            foreach(Student student in studentsArray)
+            foreach (Student student in studentsArray)
             {
                 if (student.LastName.ToLower().Contains(lastName.Trim().ToLower()))
                 {
                     foundStudents[index] = student;
                     index++;
                 }
-                    
+
             }
             return foundStudents;
         }
 
-        public static bool ContainsStudent(string lastName, Student[] studentsArray)
+        public static bool ContainsLastName(string lastName, Student[] studentsArray)
         {
             if (string.IsNullOrWhiteSpace(lastName))
                 throw new ArgumentException("Given Lastname is emtpy");
-            if (studentsArray == null)
-                throw new ArgumentNullException(nameof(studentsArray));
-            if (studentsArray.Length == 0)
-                throw new ArgumentException("Given Array is empty");
+            ValidateArray(studentsArray);
 
-            foreach(Student student in studentsArray)
+            foreach (Student student in studentsArray)
             {
                 if (student.LastName.ToLower().Contains(lastName.Trim().ToLower()))
                 {
@@ -278,14 +260,10 @@ namespace Homework_12
             }
             return false;
         }
-    
+
         public static Student[] SortByGpa(Student[] studentsArray)
         {
-            if (studentsArray == null)
-                throw new ArgumentNullException(nameof(studentsArray));
-            if (studentsArray.Length == 0)
-                throw new ArgumentException("Given Array is empty");
-
+            ValidateArray(studentsArray);
             Array.Sort(studentsArray);
             Array.Reverse(studentsArray);
             return studentsArray;
@@ -297,6 +275,86 @@ namespace Homework_12
                 throw new ArgumentNullException(nameof(student));
             return GPA.CompareTo(student.GPA);
         }
+
+        public static Student[] AddStudent(Student student, Student[] studentsArray)
+        {
+            if (student == null)
+                throw new ArgumentNullException(nameof(student));
+            ValidateArray(studentsArray);
+
+            Student[] newStudentsArray = new Student[studentsArray.Length + 1];
+            for(int i = 0; i < studentsArray.Length; i++)
+            {
+                newStudentsArray[i] = studentsArray[i];
+            }
+            newStudentsArray[newStudentsArray.Length - 1] = student;
+
+            return newStudentsArray;
+        }
+
+        //with collections
+        public static List<Student> DeleteStudent(string email, Student[] studentsArray)
+        {
+            if (email == null)
+                throw new ArgumentNullException(nameof(email));
+            ValidateArray(studentsArray);
+            List<Student> students = new List<Student>(studentsArray);
+            for (int i = 0; i < students.Count; i++)
+            {
+                if (students[i].Email == email)
+                {
+                    students.Remove(students[i]);
+                    break;
+                }
+            }
+
+            return students;
+        }
+
+        public static bool ContainsEmail(string email, Student[] studentsArray)
+        {
+            if (email == null)
+                throw new ArgumentNullException(nameof(email));
+
+            ValidateArray(studentsArray);
+            foreach(Student student in studentsArray)
+            {
+                if (student.Email.Contains(email))
+                    return true;
+            }
+            return false;
+        }
+        private static void ValidateArray(Array array)
+       {
+            if (array == null)
+                throw new ArgumentNullException(nameof(array));
+            if (array.Length == 0)
+                throw new ArgumentException("Given Array is empty");
+       }
+
+        public void Print()
+        {
+            Console.WriteLine(ToString());
+        }
+
+        public static bool operator >(Student firstSudent, Student secondStudent)
+        {
+            return firstSudent.GPA > secondStudent.GPA;
+        }
+        public static bool operator <(Student firstSudent, Student secondStudent)
+        {
+            return firstSudent.GPA < secondStudent.GPA;
+        }
+        public static bool operator <=(Student firstSudent, Student secondStudent)
+        {
+            return firstSudent.GPA <= secondStudent.GPA;
+        }
+        public static bool operator >=(Student firstSudent, Student secondStudent)
+        {
+            return firstSudent.GPA >= secondStudent.GPA;
+        }
+
+
     }
 
     enum Faculty : byte
@@ -306,5 +364,8 @@ namespace Homework_12
         Design,
         Medicine
     }
-
 }
+
+
+
+
