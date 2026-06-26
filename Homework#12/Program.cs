@@ -1,5 +1,8 @@
-﻿using System;
-using System.Numerics;
+﻿using Homework_12.Enums;
+using Homework_12.Loggers;
+using Homework_12.Models;
+using Homework_12.Services;
+
 
 namespace Homework_12
 {
@@ -7,195 +10,193 @@ namespace Homework_12
     {
         static void Main(string[] args)
         {
-
-            Student[] studentsArray =
+            StudentManagerService manager = new StudentManagerService();
+            string chooser = "1";
+            while (chooser != "8")
             {
-                new Student("Sandro", "Bochorisvhili", 21, "Email@gamil.com", "599555888", 3.0, Faculty.Business),
-                new Student("Mariami", "Loria", 19, "Email@gamil.com", "599555888", 2.5, Faculty.Business),
-                new Student("Elene", "Morgoshia", 20, "Email@gamil.com", "599555888", 3.5, Faculty.IT),
-                new Student("Nikolozi", "Morgoshia", 17, "Email@gamil.com", "599555888", 2.0, Faculty.Design),
-                new Student("Alexandre", "Gvaramia", 17, "Email@gamil.com", "599555888", 3.8, Faculty.Business),
-                new Student("Demetre", "Vasadze", 18, "Email@gamil.com", "599555888", 4.0, Faculty.IT),
-                new Student("Gvantsa", "Vadachkoria", 21, "Email@gamil.com", "599555888", 2.4, Faculty.IT),
-                new Student("Lika", "Meladze", 21, "Email@gamil.com", "599555888", 2.1, Faculty.IT),
-                new Student("Ana", "Aslanisvhili", 22, "Email@gamil.com", "599555888", 3.9, Faculty.Business),
-                new Student("Giorgi", "beroshivili", 20, "Email@gamil.com", "599555888", 4.0, Faculty.Design),
-            };
+                Console.WriteLine("Menu: Select One of them");
+                Console.WriteLine("1. Display students");
+                Console.WriteLine("2. Find the best student");
+                Console.WriteLine("3. Calculate average GPA");
+                Console.WriteLine("4. Search student by lastName");
+                Console.WriteLine("5. Sort students by GPA");
+                Console.WriteLine("6. Add student");
+                Console.WriteLine("7. Remove student");
+                Console.WriteLine("8. Exit");
 
-            foreach (Student student in studentsArray)
-            {
-                Console.WriteLine(student.ToString());
-            }
-
-            Console.WriteLine();
-            Console.WriteLine("The best students are: ");
-            Student[] theBestStudents = Student.GetBestStudents(studentsArray);
-            foreach (Student student in theBestStudents)
-            {
-                Console.WriteLine(student.ToString());
-            }
-
-            Console.WriteLine();
-            Console.WriteLine("The best students again(with collection): ");
-            List<Student> bestStudents = Student.GetHighestGpaStudents(studentsArray);
-            foreach (Student student in bestStudents)
-            {
-                Console.WriteLine(student.ToString());
-            }
-
-            Console.WriteLine();
-            double gpaAverage = Student.GetGpaAverage(studentsArray);
-            Console.WriteLine($"Average of Students GPA: {gpaAverage}");
-
-            Console.WriteLine();
-            Console.WriteLine("Please Enter a lastName: ");
-            string studentLastName = Console.ReadLine();
-            if (Student.ContainsLastName(studentLastName, studentsArray))
-            {
-                List<Student> resultStudents = Student.GetStudentsByLastName(studentLastName, studentsArray);
-                Console.WriteLine($"Students whose lastname is {studentLastName}:");
-                foreach (Student student in resultStudents)
+                chooser = Console.ReadLine();
+                switch (chooser)
                 {
-                    Console.WriteLine(student.ToString());
+                    case "1":
+                        Console.WriteLine("Display Studetns: ");
+                        Student[] students = manager.GetStudetns();
+                        foreach(Student student in students)
+                        {
+                            Console.WriteLine(student.ToString());
+                        }
+                        break;
+
+                    case "2":
+                        Console.WriteLine("Find the best student(s): ");
+                        Student[] bestStudents = manager.GetBestStudents();
+                        //List<Student> HighestGpaStudents = manager.GetHighestGpaStudents();
+                        foreach (Student student in bestStudents)
+                        {
+                            Console.WriteLine(student.ToString());
+                        }
+                        break;
+
+                    case "3":
+                        Console.WriteLine("Calculate Average GPA: ");
+                        double gpaAverage = manager.GetGpaAverage();
+                        Console.WriteLine($"Average GPA: {gpaAverage}");
+                        break;
+
+                    case "4":
+                        Console.WriteLine("Search student by lastName");
+                        try
+                        {
+                            Console.WriteLine("Enter lastname please: ");
+                            string lastName = Console.ReadLine();
+                            if (string.IsNullOrWhiteSpace(lastName))
+                                throw new ArgumentException("Lastname cannot be empty");
+
+                            if (manager.ContainsLastName(lastName))
+                            {
+                                Student[] studentsByLastname = manager.FindStudentsByLastName(lastName);
+                                foreach (Student student in studentsByLastname)
+                                {
+                                    Console.WriteLine(student.ToString());
+                                }
+                            }
+                            else
+                            {
+                                Console.WriteLine("There is no student with this lastname");
+                            }
+                        }
+                        catch(Exception ex)
+                        {
+                            Console.WriteLine(ex.Message);
+                        }
+                        break;
+
+                    case "5":
+                        Console.WriteLine("Sort students by GPA");
+                        Student[] studentsSortedByGpa = manager.SortByGpa();
+                        foreach(Student student in studentsSortedByGpa)
+                        {
+                            Console.WriteLine(student.ToString());
+                        }
+                        break;
+
+                    case "6":
+                        Console.WriteLine("Add student");
+
+                        try
+                        {
+                            //name
+                            Console.WriteLine("Please Enter Name: ");
+                            string name = Console.ReadLine();
+                            if (string.IsNullOrEmpty(name))
+                                throw new ArgumentException("name cannot be empty");
+
+                            //lastName
+                            Console.WriteLine("Enter Lastname: ");
+                            string lastName = Console.ReadLine();
+                            if (string.IsNullOrWhiteSpace(lastName))
+                                throw new ArgumentException("lastName cannot be empty");
+
+                            //age
+                            Console.WriteLine("Please Enter Age(student age must be greater than 16)");
+                            byte age;
+                            bool isValidAge = byte.TryParse(Console.ReadLine(), out age);
+                            if (!isValidAge)
+                                throw new ArgumentException("Invalid input!");
+                            if (age <= 16)
+                                throw new ArgumentOutOfRangeException("Age must be grater than 16!");
+
+                            //phone number
+                            Console.WriteLine("Please enter phone number: ");
+                            string phone = Console.ReadLine();
+                            if (string.IsNullOrWhiteSpace(phone))
+                                throw new ArgumentException("phone cannot be empty");
+                            
+                            //gpa
+                            Console.WriteLine("Please Enter GPA(from 0 to 100): ");
+                            double gpa;
+                            bool validGpa = double.TryParse(Console.ReadLine(), out gpa);
+                            if (!validGpa)
+                                throw new ArgumentException("Invalid input");
+                            if (gpa < 0 || gpa > 100)
+                                throw new ArgumentOutOfRangeException("GPA must be between 0 and 100.");
+
+                            //email
+                            Console.WriteLine("Please Enter Email: ");
+                            string email = Console.ReadLine();
+                            if (string.IsNullOrWhiteSpace(email))
+                                throw new ArgumentException("email cannot be empty");
+                            if (!email.Contains('@'))
+                                throw new ArgumentException("Email must contain @ character");
+
+
+                            Console.WriteLine("Please enter Faculty: IT, Business, Design, Medicine");
+                            Faculty faculty;
+                            bool validFaculty = Enum.TryParse(Console.ReadLine(), out faculty);
+                            if (!validFaculty)
+                                throw new ArgumentException("Invalid Input");
+
+                            double convertedGpa = (gpa / 100.0) * 4;
+                            Student newStudent = new Student(name, lastName, age, email, phone, convertedGpa, faculty);
+                            manager.AddStudent(newStudent);
+                            Console.WriteLine("Student Added!");
+                            goto case "1";
+                        }
+                        catch (ArgumentOutOfRangeException ex)
+                        {
+                            Console.WriteLine(ex.Message);
+                        }
+                        catch(Exception ex)
+                        {
+                            Console.WriteLine(ex.Message);
+                        }
+                        break;
+                    
+                    case "7":
+                        Console.WriteLine("Remove student: ");
+
+                        try
+                        {
+                            Console.WriteLine("Please Enter student's email: ");
+                            string email = Console.ReadLine();
+                            if (string.IsNullOrWhiteSpace(email))
+                                throw new ArgumentException("email cannot be empty");
+                            if (!email.Contains('@'))
+                                throw new ArgumentException("Email must contain @ character");
+                            
+                            if (manager.ContainsEmail(email))
+                            {
+                                manager.DeleteStudent(email);
+                                Console.WriteLine("Student delated");
+                                goto case "1";
+                            }
+                            else
+                            {
+                                Console.WriteLine("There is not student with this email");
+                            }
+                        }
+                        catch (Exception ex)
+                        {
+                            Console.WriteLine(ex.Message);
+                        }
+                        break;
+                    case "8":
+                        return;
+                    default:
+                        Console.WriteLine("Invalid choose");
+                        break;
                 }
-            }
-            else
-            {
-                Console.WriteLine("There is no student with this lastName");
-            }
-
-            Console.WriteLine();
-            Console.WriteLine("Please Enter a lastName: ");
-            string lastName = Console.ReadLine();
-            if (Student.ContainsLastName(lastName, studentsArray))
-            {
-                Student[] foundStudents = Student.FindStudentsByLastName(lastName, studentsArray);
-                Console.WriteLine($"Students whose lastname is {lastName}: ");
-                foreach (Student student in foundStudents)
-                {
-                    Console.WriteLine(student.ToString());
-                }
-            }
-            else
-            {
-                Console.WriteLine("There is no student with this lastname");
-            }
-
-            Console.WriteLine();
-            Console.WriteLine("Students sorted by GPA: ");
-            Student[] sortedByGpaStudents = Student.SortByGpa(studentsArray);
-            foreach (Student student in sortedByGpaStudents)
-            {
-                Console.WriteLine(student.ToString());
-            }
-
-
-            Console.WriteLine();
-            try
-            {
-                Console.WriteLine("Please Enter the student information: ");
-
-                Console.WriteLine("Enter Name: ");
-                string userName = Console.ReadLine();
-                if (string.IsNullOrEmpty(userName))
-                    throw new ArgumentNullException(nameof(userName));
-
-                Console.WriteLine("Enter Lastname: ");
-                string userLastName = Console.ReadLine();
-                if (string.IsNullOrWhiteSpace(userLastName))
-                    throw new ArgumentNullException(nameof(userLastName));
-
-                Console.WriteLine("Enter Age: ");
-                byte age;
-                bool validUserAge = byte.TryParse(Console.ReadLine(), out age);
-                if (!validUserAge)
-                    throw new FormatException();
-                if (age <= 16)
-                    throw new ArgumentOutOfRangeException("Age must be greater than 16!");
-
-                Console.WriteLine("Enter Email: ");
-                string email = Console.ReadLine();
-                if (email == null)
-                    throw new ArgumentNullException(nameof(email));
-                if (!email.Contains('@'))
-                    throw new FormatException("Email must contain @ character");
-
-
-                Console.WriteLine("Enter phone number: ");
-                string phoneNumber = Console.ReadLine();
-                if (phoneNumber == null)
-                    throw new ArgumentNullException(nameof(phoneNumber));
-
-                Console.WriteLine("Enter GPA(0 - 100)");
-                double gpa;
-                bool validGpa = double.TryParse(Console.ReadLine(), out gpa);
-                if (!validGpa)
-                    throw new FormatException("Invalid input");
-                if (gpa < 0 || gpa > 100)
-                    throw new ArgumentOutOfRangeException("GPA must be between 0 and 100.");
-
-                Console.WriteLine("Enter Faculty: IT, Business, Design, Medicine");
-                Faculty faculty;
-                bool validFaculty = Enum.TryParse(Console.ReadLine(), out faculty);
-                if (!validFaculty)
-                    throw new FormatException("Invalid Input");
-
-                double convertedGpa = (gpa / 100.0) * 4;
-                Student newStudent = new Student(userName, userLastName, age, email, phoneNumber, convertedGpa, faculty);
-                Student[] updatedStudentsArray = Student.AddStudent(newStudent, studentsArray);
-                foreach (Student student in updatedStudentsArray)
-                {
-                    Console.WriteLine(student.ToString());
-                }
 
             }
-            catch (ArgumentNullException ex)
-            {
-                Console.WriteLine(ex.Message);
-            }
-            catch (FormatException ex)
-            {
-                Console.WriteLine(ex.Message);
-            }
-            catch (ArgumentOutOfRangeException ex)
-            {
-                Console.WriteLine(ex.Message);
-            }
-            catch(ArgumentException ex)
-            {
-                Console.WriteLine(ex.Message);
-            }
-
-
-            Console.WriteLine("Delate the student: ");
-            Console.WriteLine("Enter the student's Email: ");
-            string studentEmail = Console.ReadLine();
-            if(Student.ContainsEmail(studentEmail, studentsArray))
-            {
-                List<Student> updatedStudents = Student.DeleteStudent(studentEmail, studentsArray);
-                foreach(Student student in updatedStudents)
-                {
-                    Console.WriteLine(student.ToString());
-                }
-            }
-            else
-            {
-                Console.WriteLine("There is no student with the given email");
-            }
-
-
-            Console.WriteLine("Compare Students(using operators): ");
-            Student student1 = new Student("Sandro", "Mamageishvili", 20, "Email@gamil.com", "599555888", 3.5, Faculty.IT);
-            Student student2 = new Student("Elene", "Morgoshia", 20, "Email@gamil.com", "599555888", 4.0, Faculty.IT);
-            if(student1 > student2)
-            {
-                Console.WriteLine($"Student1 has better gpa");
-            }
-            else
-            {
-                Console.WriteLine("Student2 has better gpa");
-            }
-
 
             Console.WriteLine();
             using Logger logger = new Logger();
