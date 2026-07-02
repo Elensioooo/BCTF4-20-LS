@@ -23,17 +23,12 @@ namespace Homework_14
             return resultCollection;
         }
 
-        //????OrderBy - კოლექციაში არსებული ელემენტებს ალაგებს ზრდადობით
-        //აქ იმიტომ შემოვაგდე Func, რადგან დამედგინა ველიუ რის მიხედვითაც უნდა შედარებულიყვენენ
-        //ანუ თუ მაგალითად მაქვს სტუდენტების ობიექტების კოლექცია და თითო სტუდენტს აქვს gpa-იც age-იც
-        //Func-ის დახმარებით ვეტყვი რომ GPA არის ველიუ და ეგენი აიღე შესადარებელ აითემად
-        //ქვემოთ ასევე გამოვიყენე Comparer<T2>.Default.Compare(leftValue, rightValue)
-        //ეს მეთოდი ადარებს ელემენტებს და აბრუნებს int-ს. (ეს არ ვიცოდი და მოვსერჩე)
+        //????OrderBy - 
+        //ალბათ აქ უკეთესი სოლუშენი Comparer<T>.Default.Compare(leftValue, rightValue)
         // <0 - left is smaller
         // =0 - Left equals right
         // >0 - left is grater 
-        //ალბათ აქ უკეთესი სოლუშენი იქნებოდა რომ  compare-ის ლოგიკაც დაგვემატებინა Func-ით?
-        public static IEnumerable<T1> MyOrderBy<T1,T2>(IEnumerable<T1> collection, Func<T1, T2> method)
+        public static IEnumerable<T1> MyOrderBy<T1,T2>(IEnumerable<T1> collection, Func<T1, T2> method, Func<T2, T2, int> compare)
         {
             if (collection == null)
                 throw new ArgumentNullException(nameof(collection));
@@ -45,7 +40,7 @@ namespace Homework_14
                 {
                     var leftValue = method(list[j]);
                     var rightValue = method(list[j + 1]);
-                    if(Comparer<T2>.Default.Compare(leftValue, rightValue) > 0)
+                    if(compare(leftValue, rightValue) > 0)
                     {
 
                         T1 temp = list[j];

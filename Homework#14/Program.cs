@@ -30,8 +30,16 @@ namespace Homework_14
             students.Add(student1);
             students.Add(student2);
             students.Add(student3);
-            IEnumerable<Student> sortedByGpa = Algorithms.MyOrderBy(students, (Student student) => student.GPA);
-            foreach(Student student in sortedByGpa)
+            IEnumerable<Student> sortedByGpa = Algorithms.MyOrderBy(students, (Student student) => student.GPA, delegate (double leftGpa, double rightGpa)
+            {
+                if (leftGpa > rightGpa)
+                    return 1;
+                if (leftGpa < rightGpa)
+                    return -1;
+                return 0;
+            });
+
+            foreach (Student student in sortedByGpa)
             {
                 Console.WriteLine(student.ToString());
             }
